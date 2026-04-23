@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:oromiya_communication/models/navigation_data.dart';
 import 'package:oromiya_communication/theme/app_theme.dart';
-import 'package:oromiya_communication/screens/login_screen.dart';
 import 'package:oromiya_communication/widgets/custom_header.dart';
-import 'package:oromiya_communication/widgets/custom_footer.dart';
 import 'package:oromiya_communication/widgets/about_content.dart';
 import 'package:oromiya_communication/widgets/contact_content.dart';
 import 'package:oromiya_communication/localization/app_translations.dart';
 import 'package:oromiya_communication/localization/language_provider.dart';
+import 'package:oromiya_communication/screens/news_detail_screen.dart';
+import 'package:oromiya_communication/screens/tenders_screen.dart';
+import 'package:oromiya_communication/screens/shop_screen.dart';
+import 'package:oromiya_communication/screens/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,14 +20,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedNavIndex = 0;
+  int _bottomIndex = 0;
+  int _selectedNavIndex = 0; 
   String? _activeSubCategory;
-  String _sortBy = 'Latest';
 
-  void _onNavItemTap(int index) {
+  void _handleMenuAction(String action) {
     setState(() {
-      _selectedNavIndex = index;
+      _bottomIndex = 0;
+      _selectedNavIndex = 0;
+      _activeSubCategory = action;
+    });
+  }
+
+  void _onBottomNavTapped(int index) {
+    setState(() {
+      _bottomIndex = index;
       _activeSubCategory = null;
+      if (index == 0) _selectedNavIndex = 0;
+      if (index == 1) _selectedNavIndex = 1;
     });
   }
 
@@ -35,417 +47,244 @@ class _HomeScreenState extends State<HomeScreen> {
     final lang = lp.currentLanguage;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.primaryBlue,
         elevation: 0,
-        toolbarHeight: 80,
-        title: const CustomHeader(),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(100),
-          child: Column(
-            children: [
-              _buildMainNavigation(lang),
-              _buildSubNavigation(lang),
-            ],
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildHeroSection(lang),
-            _buildMainContent(lang),
-            const CustomFooter(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainNavigation(String lang) {
-    return Container(
-      width: double.infinity,
-      color: Colors.white,
-      height: 50,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: NavigationData.mainNavItems.length,
-        itemBuilder: (context, index) {
-          final item = NavigationData.mainNavItems[index];
-          final isSelected = _selectedNavIndex == index;
-          return InkWell(
-            onTap: () => _onNavItemTap(index),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: isSelected ? AppTheme.primaryBlue : Colors.transparent,
-                    width: 3,
-                  ),
-                ),
+        leading: (_activeSubCategory != null || (_bottomIndex == 0 && _selectedNavIndex != 0)) 
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => setState(() { _activeSubCategory = null; if(_bottomIndex == 0) _selectedNavIndex = 0; }),
+              )
+            : const Padding(
+                padding: EdgeInsets.all(12.0),
+                child: Icon(Icons.account_balance, color: Colors.white, size: 24),
               ),
-              child: Text(
-                AppTranslations.getText(lang, item.title).toUpperCase(),
-                style: TextStyle(
-                  color: isSelected ? AppTheme.primaryBlue : Colors.black87,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          );
-        },
+        title: CustomHeader(onMenuAction: _handleMenuAction),
+        centerTitle: false,
       ),
-    );
-  }
-
-  Widget _buildSubNavigation(String lang) {
-    final activeItem = NavigationData.mainNavItems[_selectedNavIndex];
-    if (activeItem.subItems == null || activeItem.subItems!.isEmpty) {
-      return Container(
-        height: 50,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey[200]!)),
-        ),
-      );
-    }
-
-    return Container(
-      height: 50,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey[200]!)),
-      ),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: activeItem.subItems!.length,
-        itemBuilder: (context, index) {
-          final sub = activeItem.subItems![index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Center(
-              child: TextButton(
-                onPressed: () => setState(() => _activeSubCategory = sub),
-                child: Text(
-                  AppTranslations.getText(lang, sub),
-                  style: TextStyle(
-                    color: _activeSubCategory == sub ? AppTheme.primaryBlue : Colors.black54,
-                    fontWeight: _activeSubCategory == sub ? FontWeight.bold : FontWeight.normal,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildHeroSection(String lang) {
-    return Container(
-      width: double.infinity,
-      height: 250,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: NetworkImage('https://www.oromiacommunication.gov.et/website/images/slider/banner1.jpg'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Container(
-        color: Colors.black.withOpacity(0.4),
-        padding: const EdgeInsets.all(30),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppTranslations.getText(lang, 'app_title'),
-              style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              AppTranslations.getText(lang, 'slogan'),
-              style: const TextStyle(color: Colors.white70, fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainContent(String lang) {
-    final activeItem = NavigationData.mainNavItems[_selectedNavIndex];
-    
-    if (activeItem.title == 'Tenders') {
-      return const TendersScreenContent();
-    } else if (activeItem.title == 'Shops') {
-      return const ShopScreenContent();
-    } else if (activeItem.title == 'About') {
-      if (_activeSubCategory == 'Contact Us') {
-        return ContactContent(lang: lang);
-      }
-      return AboutContent(lang: lang);
-    }
-    
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  AppTranslations.getText(lang, _activeSubCategory ?? activeItem.title),
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.search, color: AppTheme.primaryBlue),
-                onPressed: () {},
-              ),
-              DropdownButton<String>(
-                value: _sortBy,
-                items: <String>['Latest', 'Most Read', 'Most Viewed'].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(AppTranslations.getText(lang, value), style: const TextStyle(fontSize: 12)),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _sortBy = newValue!;
-                  });
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _buildPopularTags(lang),
-          const SizedBox(height: 20),
-          _buildDynamicList(lang),
+      body: _buildBody(context, lang),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _bottomIndex,
+        onTap: _onBottomNavTapped,
+        selectedItemColor: AppTheme.primaryBlue,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        items: [
+          BottomNavigationBarItem(icon: const Icon(Icons.home_outlined), label: AppTranslations.getText(lang, 'home')),
+          BottomNavigationBarItem(icon: const Icon(Icons.newspaper_outlined), label: AppTranslations.getText(lang, 'news')),
+          BottomNavigationBarItem(icon: const Icon(Icons.search), label: AppTranslations.getText(lang, 'Search')),
+          BottomNavigationBarItem(icon: const Icon(Icons.person_outline), label: AppTranslations.getText(lang, 'sign_in')),
         ],
       ),
     );
   }
 
-  Widget _buildPopularTags(String lang) {
-    final tags = ['Politics', 'Social', 'Economy', 'Sport', 'Technology', 'Environment', 'Features'];
+  Widget _buildBody(BuildContext context, String lang) {
+    switch (_bottomIndex) {
+      case 0: return _buildHomeTab(context, lang);
+      case 1: return _buildNewsTab(context, lang);
+      case 2: return _buildSearchTab(context, lang);
+      case 3: return _buildProfileTab(context, lang);
+      default: return _buildHomeTab(context, lang);
+    }
+  }
+
+  Widget _buildHomeTab(BuildContext context, String lang) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Popular Tags', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        const SizedBox(height: 10),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: tags.map((tag) => ActionChip(
-            label: Text(tag, style: const TextStyle(fontSize: 12)),
-            onPressed: () {
-              // Navigate to the News section and select the tag as sub-category
-              setState(() {
-                _selectedNavIndex = 1; // Assuming News is index 1
-                _activeSubCategory = tag;
-              });
-            },
-            backgroundColor: Colors.grey[100],
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-          )).toList(),
+        _buildTopCategories(context, lang),
+        Expanded(
+          child: SingleChildScrollView(
+            child: _activeSubCategory != null
+                ? _buildSubCategoryContent(context, lang, _activeSubCategory!)
+                : _selectedNavIndex != 0
+                    ? _buildSubGrid(context, lang)
+                    : _buildHomeFeed(context, lang),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildDynamicList(String lang) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 5,
-      itemBuilder: (context, index) {
-        final currentCat = _activeSubCategory ?? NavigationData.mainNavItems[_selectedNavIndex].title;
-        final imageUrl = NavigationData.categoryImages[currentCat] ?? 
-                         'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800';
+  Widget _buildTopCategories(BuildContext context, String lang) {
+    final items = NavigationData.mainNavItems.where((item) => 
+      item.title != 'Home' && item.title != 'News' && item.title != 'Language' && item.title != 'About'
+    ).toList();
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 20),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[200]!),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: 180,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${AppTranslations.getText(lang, currentCat)} News Update #${index + 1}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Official communication regarding the latest developments in this sector. Providing transparent and timely information to the public.',
-                      style: TextStyle(color: Colors.black54, fontSize: 13),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                          onPressed: () {},
-                          child: Text(AppTranslations.getText(lang, 'read_more'), style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
-                        ),
-                        Row(
-                          children: const [
-                            Icon(Icons.remove_red_eye, size: 14, color: Colors.grey),
-                            SizedBox(width: 4),
-                            Text('1.2k', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class TendersScreenContent extends StatelessWidget {
-  const TendersScreenContent({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.3,
-            children: [
-              _box('Calbaasii waliigala', '0', Colors.blue),
-              _box('Calbaasii kan gatii hin qabne', '1', Colors.green),
-              _box('Kaffaltiin Barbaachisa', '0', Colors.orange),
-              _box('Dhiyootti cufamu', '0', Colors.red),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Qajeelfama iyyannoo:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                SizedBox(height: 8),
-                Text('• Calbaasii kan gatii hin qabne'),
-                Text('• Kaffaltiin Barbaachisa'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _box(String title, String val, Color color) {
     return Container(
+      height: 48,
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: color, width: 2),
-        borderRadius: BorderRadius.circular(4),
+        color: Theme.of(context).cardColor,
+        border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.2))),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(val, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: color)),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
-}
-
-class ShopScreenContent extends StatelessWidget {
-  const ShopScreenContent({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.7,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: 4,
-        itemBuilder: (context, index) {
-          return Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              children: [
-                Expanded(child: Container(color: Colors.grey[100], child: const Icon(Icons.shopping_bag, size: 50, color: Colors.grey))),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Text('Product ${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 4),
-                      const Text('ETB 500.00', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen())),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.black, minimumSize: const Size(double.infinity, 36)),
-                        child: const Text('LOGIN TO BUY', style: TextStyle(color: Colors.white, fontSize: 10)),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        itemBuilder: (ctx, index) {
+          final item = items[index];
+          // CRITICAL FIX: Safe index mapping
+          final realIndex = NavigationData.mainNavItems.indexWhere((e) => e.title == item.title);
+          final sel = _selectedNavIndex == realIndex;
+          
+          return InkWell(
+            onTap: () {
+              if (item.title == 'Shops') {
+                Navigator.push(ctx, MaterialPageRoute(builder: (_) => const ShopScreen()));
+                return;
+              }
+              if (item.title == 'Tenders') {
+                Navigator.push(ctx, MaterialPageRoute(builder: (_) => const TendersScreen()));
+                return;
+              }
+              setState(() {
+                _selectedNavIndex = realIndex;
+                _activeSubCategory = null;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: sel ? AppTheme.primaryBlue : Colors.transparent, width: 3))),
+              child: Text(AppTranslations.getText(lang, item.title),
+                  style: TextStyle(color: sel ? AppTheme.primaryBlue : null, fontWeight: sel ? FontWeight.bold : null)),
             ),
           );
         },
       ),
     );
   }
+
+  Widget _buildHomeFeed(BuildContext context, String lang) {
+    return Column(
+      children: [
+        _buildHeroSection(lang),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(AppTranslations.getText(lang, 'latest'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              _buildNewsList(context, lang, 'Political', itemCount: 4),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroSection(String lang) {
+    return Container(
+      width: double.infinity, height: 160, margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [AppTheme.primaryBlue, Color(0xFF1565C0)]),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(AppTranslations.getText(lang, 'app_title'), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text(AppTranslations.getText(lang, 'slogan'), style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubCategoryContent(BuildContext context, String lang, String sub) {
+    if (sub == 'Contact Us') return ContactContent(lang: lang);
+    if (sub == 'About Us') return AboutContent(lang: lang);
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(AppTranslations.getText(lang, sub), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+          const SizedBox(height: 16),
+          _buildNewsList(context, lang, sub),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNewsList(BuildContext context, String lang, String category, {int itemCount = 3}) {
+    final imageUrl = NavigationData.categoryImages[category];
+    return ListView.builder(
+      shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+      itemCount: itemCount,
+      itemBuilder: (context, index) {
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: InkWell(
+            onTap: () {},
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+                  child: imageUrl != null ? Image.network(imageUrl, width: 100, height: 100, fit: BoxFit.cover) : Container(width: 100, height: 100, color: Colors.grey[200]),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(AppTranslations.getText(lang, category).toUpperCase(), style: const TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text(AppTranslations.getText(lang, 'read_more') + '...', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSubGrid(BuildContext context, String lang) {
+    final item = NavigationData.mainNavItems[_selectedNavIndex];
+    final subItems = item.subItems!;
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: GridView.builder(
+        shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12),
+        itemCount: subItems.length,
+        itemBuilder: (context, index) => InkWell(
+          onTap: () => setState(() => _activeSubCategory = subItems[index]),
+          child: Container(
+            decoration: BoxDecoration(color: AppTheme.primaryBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+            alignment: Alignment.center,
+            child: Text(AppTranslations.getText(lang, subItems[index]), textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNewsTab(BuildContext context, String lang) {
+    final categories = ['Political', 'Social', 'Economy', 'Sport', 'Technology', 'Environments'];
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: categories.length,
+      itemBuilder: (context, index) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(AppTranslations.getText(lang, categories[index]), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          _buildNewsList(context, lang, categories[index], itemCount: 2),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchTab(BuildContext context, String lang) => const Center(child: Icon(Icons.search, size: 100, color: Colors.grey));
+  Widget _buildProfileTab(BuildContext context, String lang) => const Center(child: Icon(Icons.person, size: 100, color: Colors.grey));
 }

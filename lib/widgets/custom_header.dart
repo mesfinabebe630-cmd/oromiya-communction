@@ -2,42 +2,43 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:oromiya_communication/theme/app_theme.dart';
-import 'package:oromiya_communication/screens/login_screen.dart';
 import 'package:oromiya_communication/localization/app_translations.dart';
 import 'package:oromiya_communication/localization/language_provider.dart';
+import 'package:oromiya_communication/theme/theme_provider.dart';
 
 class CustomHeader extends StatefulWidget {
-  const CustomHeader({super.key});
+  final Function(String)? onMenuAction;
+  const CustomHeader({super.key, this.onMenuAction});
 
   @override
   State<CustomHeader> createState() => _CustomHeaderState();
 }
 
 class _CustomHeaderState extends State<CustomHeader> {
-  final List<String> _headlines = [
-    "The urbanization strategy is changing the lives of the community!",
-    "The stage of our struggle is Economy, Education and Technology as well as, System Building!",
-    "Agriculture has been radically transformed to increase production and productivity.",
-  ];
   int _currentHeadlineIndex = 0;
-  late Timer _timer;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      if (mounted) {
-        setState(() {
-          _currentHeadlineIndex = (_currentHeadlineIndex + 1) % _headlines.length;
-        });
-      }
+      if (mounted) setState(() => _currentHeadlineIndex = (_currentHeadlineIndex + 1) % 3);
     });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
+  }
+
+  void _openMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _SettingsBottomSheet(onAction: widget.onMenuAction),
+    );
   }
 
   @override
@@ -45,153 +46,162 @@ class _CustomHeaderState extends State<CustomHeader> {
     final lp = Provider.of<LanguageProvider>(context);
     final lang = lp.currentLanguage;
 
-    return Container(
-      height: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        children: [
-          // 1. Logo Section
-          Row(
-            children: [
-              Image.asset(
-                'assets/ic_launcher.png',
-                height: 50,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.account_balance, color: Colors.white, size: 35),
-              ),
-              const SizedBox(width: 8),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppTranslations.getText(lang, 'app_title').split(' ')[0],
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    AppTranslations.getText(lang, 'app_title').replaceFirst(AppTranslations.getText(lang, 'app_title').split(' ')[0], '').trim().toUpperCase(),
-                    style: const TextStyle(color: Colors.white70, fontSize: 7, letterSpacing: 0.5),
-                  ),
-                ],
-              ),
-            ],
+    final List<String> headlines = [
+      AppTranslations.getText(lang, 'slogan'),
+      AppTranslations.getText(lang, 'Effective communication for Oromia Prosperity'),
+      AppTranslations.getText(lang, 'The urbanization strategy is changing lives'),
+    ];
+
+    return Row(
+      children: [
+        // LEFT SIDE: APP ICON
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Image.asset(
+            'assets/ic_launcher.png',
+            width: 32,
+            height: 32,
+            errorBuilder: (_, __, ___) => const Icon(Icons.account_balance, color: Colors.white, size: 28),
           ),
+        ),
+        const SizedBox(width: 8),
 
-          const SizedBox(width: 15),
-
-          // 2. Date Section (White Rectangle)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        // MIDDLE: SMART ANIMATED RECTANGLE
+        Expanded(
+          child: Container(
+            height: 34,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
+              color: Colors.white.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
             ),
-            child: Row(
-              children: const [
-                Text('20', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20)),
-                SizedBox(width: 4),
-                Text('APR 2026', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10)),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          // 3. Headline Label (Red Rectangle)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              '${AppTranslations.getText(lang, 'headline')} :',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
-            ),
-          ),
-
-          const SizedBox(width: 15),
-
-          // 4. News Ticker
-          Expanded(
-            child: Container(
-              height: 45,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white24),
-                borderRadius: BorderRadius.circular(4),
-                color: Colors.black12,
-              ),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 600),
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return SlideTransition(
-                    position: Tween<Offset>(begin: const Offset(0.0, 1.0), end: Offset.zero).animate(animation),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 600),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                final offsetAnimation = Tween<Offset>(
+                  begin: const Offset(0.0, 0.5),
+                  end: const Offset(0.0, 0.0),
+                ).animate(animation);
+                return ClipRect(
+                  child: SlideTransition(
+                    position: offsetAnimation,
                     child: FadeTransition(opacity: animation, child: child),
-                  );
-                },
+                  ),
+                );
+              },
+              child: Center(
+                key: ValueKey<int>(_currentHeadlineIndex),
                 child: Text(
-                  _headlines[_currentHeadlineIndex],
-                  key: ValueKey<int>(_currentHeadlineIndex),
-                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
-                  maxLines: 2,
+                  headlines[_currentHeadlineIndex],
+                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
           ),
+        ),
 
-          const SizedBox(width: 15),
+        // RIGHT SIDE: MENU ICON
+        IconButton(
+          icon: const Icon(Icons.menu, color: Colors.white, size: 26),
+          onPressed: () => _openMenu(context),
+        ),
+      ],
+    );
+  }
+}
 
-          // 5. Language Selector & Social
-          Row(
-            children: [
-              _langButton(lp, 'EN', 'en'),
-              _langButton(lp, 'OR', 'om'),
-              _langButton(lp, 'AM', 'am'),
-              const VerticalDivider(color: Colors.white24, indent: 25, endIndent: 25),
-              _socialIcon(Icons.facebook),
-              _socialIcon(Icons.play_circle_filled),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen())),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppTheme.primaryBlue,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  minimumSize: const Size(60, 30),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                ),
-                child: Text(AppTranslations.getText(lang, 'sign_in'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 9)),
-              ),
-            ],
+class _SettingsBottomSheet extends StatelessWidget {
+  final Function(String)? onAction;
+  const _SettingsBottomSheet({this.onAction});
+
+  @override
+  Widget build(BuildContext context) {
+    final lp = Provider.of<LanguageProvider>(context);
+    final tp = Provider.of<ThemeProvider>(context);
+    final lang = lp.currentLanguage;
+    final isDark = tp.isDarkMode;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+          const SizedBox(height: 20),
+          
+          ListTile(
+            leading: Icon(isDark ? Icons.dark_mode : Icons.light_mode, color: AppTheme.primaryBlue),
+            title: Text(AppTranslations.getText(lang, 'Night Mode'), style: const TextStyle(fontWeight: FontWeight.bold)),
+            trailing: Switch(
+              value: isDark,
+              onChanged: (val) => tp.toggleTheme(val),
+              activeColor: AppTheme.primaryBlue,
+            ),
           ),
+          
+          const Divider(),
+          
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(children: [Text(AppTranslations.getText(lang, 'language'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))]),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                _langOption(context, lp, 'en', 'English'),
+                const SizedBox(width: 10),
+                _langOption(context, lp, 'om', 'Oromoo'),
+                const SizedBox(width: 10),
+                _langOption(context, lp, 'am', 'አማርኛ'),
+              ],
+            ),
+          ),
+          
+          const Divider(height: 30),
+          
+          _menuItem(context, lang, Icons.info_outline, 'about_us', () {
+            Navigator.pop(context);
+            if (onAction != null) onAction!('About Us');
+          }),
+          _menuItem(context, lang, Icons.contact_support_outlined, 'contact_us', () {
+            Navigator.pop(context);
+            if (onAction != null) onAction!('Contact Us');
+          }),
+          _menuItem(context, lang, Icons.share_outlined, 'Share App', () {}),
+          _menuItem(context, lang, Icons.star_outline, 'Rate Us', () {}),
+          
+          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  Widget _langButton(LanguageProvider lp, String label, String code) {
-    bool isSelected = lp.currentLanguage == code;
-    return InkWell(
-      onTap: () => lp.changeLanguage(code),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.yellow : Colors.white70,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 10,
-          ),
-        ),
-      ),
+  Widget _langOption(BuildContext context, LanguageProvider lp, String code, String name) {
+    bool isSel = lp.currentLanguage == code;
+    return ChoiceChip(
+      label: Text(name),
+      selected: isSel,
+      onSelected: (_) => lp.changeLanguage(code),
+      selectedColor: AppTheme.primaryBlue.withOpacity(0.2),
+      labelStyle: TextStyle(color: isSel ? AppTheme.primaryBlue : null, fontWeight: isSel ? FontWeight.bold : null),
     );
   }
 
-  Widget _socialIcon(IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Icon(icon, color: Colors.white, size: 16),
+  Widget _menuItem(BuildContext context, String lang, IconData icon, String key, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: AppTheme.primaryBlue),
+      title: Text(AppTranslations.getText(lang, key)),
+      onTap: onTap,
     );
   }
 }

@@ -1,130 +1,209 @@
 import 'package:flutter/material.dart';
 import 'package:oromiya_communication/theme/app_theme.dart';
 import 'package:oromiya_communication/widgets/custom_header.dart';
-import 'package:oromiya_communication/widgets/custom_footer.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  // 0: Login, 1: Register, 2: Forgot Password
+  int _viewMode = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         backgroundColor: AppTheme.primaryBlue,
         elevation: 0,
-        toolbarHeight: 80,
-        automaticallyImplyLeading: false, // Use our custom back or home
         title: const CustomHeader(),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (_viewMode != 0) {
+              setState(() => _viewMode = 0);
+            } else {
+              Navigator.pop(context);
+            }
+          },
+        ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 50),
-            Center(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 450),
-                padding: const EdgeInsets.all(40),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey[200]!, width: 2),
-                  borderRadius: BorderRadius.zero,
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, spreadRadius: 5)
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Username or Email Address *',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey[50],
-                        border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    const Text(
-                      'Password *',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey[50],
-                        border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Checkbox(value: false, onChanged: (v) {}, activeColor: AppTheme.primaryBlue),
-                        const Text('Remember Me'),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    // LOGIN - RED
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                        ),
-                        child: const Text('LOGIN', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // REGISTER - BLACK
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                        ),
-                        child: const Text('REGISTER', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // LOST PASSWORD - BLACK BOX
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          side: BorderSide.none,
-                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                        ),
-                        child: const Text('LOST YOUR PASSWORD?', style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 450),
+            margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20)],
             ),
-            const SizedBox(height: 100),
-            const CustomFooter(),
-          ],
+            child: _buildContent(),
+          ),
         ),
       ),
     );
   }
+
+  Widget _buildContent() {
+    switch (_viewMode) {
+      case 1: return _buildRegisterForm();
+      case 2: return _buildForgotForm();
+      default: return _buildLoginForm();
+    }
+  }
+
+  // --- LOGIN FORM ---
+  Widget _buildLoginForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
+        const SizedBox(height: 24),
+        _label('Username or Email Address *'),
+        _textField(hint: 'Enter your username or email'),
+        const SizedBox(height: 16),
+        _label('Password *'),
+        _textField(hint: 'Enter your password', obscure: true),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Checkbox(value: false, onChanged: (v) {}, activeColor: AppTheme.primaryBlue),
+            const Text('Remember Me', style: TextStyle(fontSize: 13)),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _redButton('LOGIN', () {}),
+        const SizedBox(height: 20),
+        const Center(child: Text('OR', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(child: _blackButton('REGISTER', () => setState(() => _viewMode = 1))),
+            const SizedBox(width: 12),
+            Expanded(child: _blackButton('FORGET', () => setState(() => _viewMode = 2))),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // --- REGISTER FORM ---
+  Widget _buildRegisterForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Register', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
+        const SizedBox(height: 24),
+        _label('Full Name *'),
+        _textField(hint: 'Enter your full name'),
+        const SizedBox(height: 16),
+        _label('Email Address *'),
+        _textField(hint: 'Enter your email'),
+        const SizedBox(height: 16),
+        _label('Phone Number *'),
+        _textField(hint: '+251912345678', keyboardType: TextInputType.phone),
+        const SizedBox(height: 16),
+        _label('Password *'),
+        _textField(hint: 'Create a password', obscure: true),
+        const SizedBox(height: 16),
+        _label('Confirm Password *'),
+        _textField(hint: 'Confirm your password', obscure: true),
+        const SizedBox(height: 16),
+        _passwordRequirementBox(),
+        const SizedBox(height: 24),
+        _redButton('CREATE ACCOUNT', () {}),
+      ],
+    );
+  }
+
+  // --- FORGOT PASSWORD ---
+  Widget _buildForgotForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Reset Your Password', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        const Text('Enter your email and we’ll send you a password reset link.', style: TextStyle(color: Colors.grey, fontSize: 14)),
+        const SizedBox(height: 24),
+        _label('Email Address *'),
+        _textField(hint: 'Enter your email'),
+        const SizedBox(height: 32),
+        _redButton('SEND PASSWORD RESET LINK', () {}),
+      ],
+    );
+  }
+
+  Widget _label(String text) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+  );
+
+  Widget _textField({String? hint, bool obscure = false, TextInputType? keyboardType}) {
+    return TextField(
+      obscureText: obscure,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+        filled: true,
+        fillColor: Colors.grey[50],
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Colors.grey[300]!)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Colors.grey[200]!)),
+      ),
+    );
+  }
+
+  Widget _passwordRequirementBox() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: Colors.blue.withOpacity(0.05), borderRadius: BorderRadius.circular(4)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Password must contain:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+          const SizedBox(height: 6),
+          _reqItem('At least 8 characters'),
+          _reqItem('At least one uppercase letter'),
+          _reqItem('At least one lowercase letter'),
+          _reqItem('At least one number'),
+          _reqItem('One special character (@\$!%*?&)'),
+        ],
+      ),
+    );
+  }
+
+  Widget _reqItem(String text) => Row(
+    children: [
+      const Icon(Icons.check_circle_outline, size: 12, color: Colors.blue),
+      const SizedBox(width: 6),
+      Text(text, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+    ],
+  );
+
+  Widget _redButton(String text, VoidCallback onTap) => SizedBox(
+    width: double.infinity,
+    height: 50,
+    child: ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+      child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+    ),
+  );
+
+  Widget _blackButton(String text, VoidCallback onTap) => SizedBox(
+    width: double.infinity,
+    height: 50,
+    child: ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+      child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+    ),
+  );
 }
