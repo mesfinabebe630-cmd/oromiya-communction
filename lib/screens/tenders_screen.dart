@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:oromiya_communication/theme/app_theme.dart';
 import 'package:oromiya_communication/screens/login_screen.dart';
+import 'package:oromiya_communication/localization/app_translations.dart';
+import 'package:oromiya_communication/localization/language_provider.dart';
+import 'package:oromiya_communication/screens/pdf_viewer_screen.dart';
+import 'package:oromiya_communication/models/mock_data.dart';
+import 'package:oromiya_communication/models/tender_item.dart';
 
 class TendersScreen extends StatelessWidget {
   const TendersScreen({super.key});
@@ -8,50 +14,42 @@ class TendersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final lang = Provider.of<LanguageProvider>(context).currentLanguage;
+    final tenders = MockData.tenders;
     
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F7F9),
       appBar: AppBar(
-        title: const Text('Tenders'),
+        title: Text(AppTranslations.getText(lang, 'tenders')),
         backgroundColor: isDark ? const Color(0xFF1F1F1F) : AppTheme.primaryBlue,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
+      body: ListView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Top Statistics
-            Row(
-              children: [
-                Expanded(child: _statBox(context, 'Total Tenders', '12', Colors.blue)),
-                const SizedBox(width: 10),
-                Expanded(child: _statBox(context, 'Active Now', '9', Colors.orange)),
-              ],
-            ),
-            const SizedBox(height: 20),
+        children: [
+          // Top Statistics
+          Row(
+            children: [
+              Expanded(child: _statBox(context, AppTranslations.getText(lang, 'total_tenders'), '${tenders.length}', Colors.blue)),
+              const SizedBox(width: 10),
+              Expanded(child: _statBox(context, AppTranslations.getText(lang, 'active_now'), '${tenders.where((t) => t.daysLeft > 0).length}', Colors.orange)),
+            ],
+          ),
+          const SizedBox(height: 20),
 
-            // UNIFIED TENDER CARD
-            _buildSmartTenderCard(context),
-            const SizedBox(height: 20),
-            _buildSmartTenderCard(context, 
-              title: "Adama Water Expansion", 
-              id: "PRJ-20260415-8821", 
-              fee: "500.00 ETB", 
-              days: "12"
-            ),
-          ],
-        ),
+          // TENDER LIST
+          ...tenders.map((tender) => Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: _buildSmartTenderCard(context, tender),
+          )),
+        ],
       ),
     );
   }
 
-  Widget _buildSmartTenderCard(BuildContext context, {
-    String title = "Shakiso Airport", 
-    String id = "PRJ-20260303-165813", 
-    String fee = "1,000.00 ETB",
-    String days = "7"
-  }) {
+  Widget _buildSmartTenderCard(BuildContext context, TenderItem tender) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final lang = Provider.of<LanguageProvider>(context).currentLanguage;
 
     return Container(
       width: double.infinity,
@@ -60,7 +58,7 @@ class TendersScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.06), 
+            color: Colors.black.withAlpha(isDark ? 77 : 15), 
             blurRadius: 15, 
             offset: const Offset(0, 5)
           )
@@ -75,36 +73,46 @@ class TendersScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                if (tender.isFeeRequired)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withAlpha(25),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.vpn_key_outlined, size: 14, color: Colors.orange),
+                        const SizedBox(width: 5),
+                        Text(AppTranslations.getText(lang, 'fee_required'), style: const TextStyle(color: Colors.orange, fontSize: 11, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withAlpha(25),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(AppTranslations.getText(lang, 'free_tenders'), style: const TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
+                  ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
+                    color: Colors.red.withAlpha(25),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.vpn_key_outlined, size: 14, color: Colors.orange),
-                      SizedBox(width: 5),
-                      Text('Fee Required', style: TextStyle(color: Colors.orange, fontSize: 11, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text('$days Day Left', style: const TextStyle(color: Colors.red, fontSize: 11, fontWeight: FontWeight.bold)),
+                  child: Text('${tender.daysLeft} ${AppTranslations.getText(lang, tender.daysLeft > 1 ? 'days_left' : 'day_left')}', style: const TextStyle(color: Colors.red, fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
             const SizedBox(height: 16),
             
             // Title & Office
-            Text(title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1A237E))),
+            Text(tender.title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1A237E))),
             const SizedBox(height: 4),
-            Text('Oromia Presidant Office', style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey, fontSize: 13, fontWeight: FontWeight.w500)),
+            Text(tender.organization, style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey, fontSize: 13, fontWeight: FontWeight.w500)),
             const SizedBox(height: 20),
 
             // ALL IN ONE RECTANGLE BOX
@@ -121,33 +129,50 @@ class TendersScreen extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: _infoItem(context, Icons.event_available, "Closing", "Apr 30, 2026")),
-                      Expanded(child: _infoItem(context, Icons.file_download_outlined, "Document", "Available")),
+                      Expanded(child: _infoItem(context, Icons.event_available, AppTranslations.getText(lang, 'closing'), tender.closingDate)),
+                      Expanded(child: _infoItem(context, Icons.file_download_outlined, AppTranslations.getText(lang, 'document'), AppTranslations.getText(lang, 'available'))),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: _infoItem(context, Icons.fingerprint, "Project ID", id)),
-                      Expanded(child: _infoItem(context, Icons.account_balance_wallet_outlined, "Fee", fee)),
+                      Expanded(child: _infoItem(context, Icons.fingerprint, AppTranslations.getText(lang, 'project_id'), tender.id)),
+                      Expanded(child: _infoItem(context, Icons.account_balance_wallet_outlined, AppTranslations.getText(lang, 'fee'), tender.fee)),
                     ],
                   ),
                   const SizedBox(height: 20),
                   
-                  // LOGIN TO BUY BUTTON INSIDE THE BOX
+                  // VIEW/BUY BUTTON
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())),
+                      onPressed: () {
+                        if (!tender.isFeeRequired) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PdfViewerScreen(
+                                title: tender.title,
+                                url: tender.documentUrl ?? "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+                              ),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen(redirectTo: 'tenders')));
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
+                        backgroundColor: tender.isFeeRequired ? Colors.red : AppTheme.primaryBlue,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         elevation: 0,
                       ),
-                      child: const Text('LOGIN TO BUY', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                      child: Text(
+                        AppTranslations.getText(lang, tender.isFeeRequired ? 'login_to_buy' : 'view_document'), 
+                        style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.8)
+                      ),
                     ),
                   ),
                 ],
@@ -185,7 +210,7 @@ class TendersScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withAlpha(51)),
       ),
       child: Column(
         children: [

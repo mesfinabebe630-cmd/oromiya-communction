@@ -186,7 +186,6 @@ class _SettingsBottomSheet extends StatelessWidget {
           }),
           _menuItem(context, lang, Icons.share_outlined, 'Share App', () {
             Navigator.pop(context);
-            // This pulls the package name automatically so users can share and others can install
             Share.share(
               'Install the Oromia Communication Bureau app to stay updated! Download here: https://play.google.com/store/apps/details?id=com.example.oromiya_communication',
               subject: 'Oromia Communication App',
@@ -194,11 +193,10 @@ class _SettingsBottomSheet extends StatelessWidget {
           }),
           _menuItem(context, lang, Icons.star_outline, 'Rate Us', () {
             Navigator.pop(context);
-            // This takes the user directly to the Play Store "Rate" page for your app
             final Uri url = Uri.parse('market://details?id=com.example.oromiya_communication');
             launchUrl(url, mode: LaunchMode.externalApplication).catchError((_) {
-               // Fallback if market protocol fails
                launchUrl(Uri.parse('https://play.google.com/store/apps/details?id=com.example.oromiya_communication'));
+               return true;
             });
           }),
           

@@ -4,6 +4,7 @@ import 'package:oromiya_communication/theme/app_theme.dart';
 import 'package:oromiya_communication/localization/app_translations.dart';
 import 'package:oromiya_communication/localization/language_provider.dart';
 import 'package:oromiya_communication/screens/login_screen.dart';
+import 'package:oromiya_communication/models/mock_data.dart';
 
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
@@ -13,21 +14,15 @@ class ShopScreen extends StatelessWidget {
     final lp = Provider.of<LanguageProvider>(context);
     final lang = lp.currentLanguage;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final List<Map<String, String>> products = [
-      {'name': 'Kallacha Weekly', 'price': '15.00', 'img': 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=400'},
-      {'name': 'Oromia Map', 'price': '150.00', 'img': 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=400'},
-      {'name': 'History Book', 'price': '350.00', 'img': 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=400'},
-      {'name': 'Bureau Badge', 'price': '50.00', 'img': 'https://images.unsplash.com/photo-1554224155-672629188411?q=80&w=400'},
-    ];
+    final products = MockData.products;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F7F9),
       appBar: AppBar(
         title: Text(AppTranslations.getText(lang, 'Shops')),
         backgroundColor: isDark ? const Color(0xFF1F1F1F) : AppTheme.primaryBlue,
+        elevation: 0,
       ),
-      // Footer is removed here (no Footer widget at bottom)
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -49,32 +44,47 @@ class ShopScreen extends StatelessWidget {
                 Expanded(
                   child: ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                    child: Image.network(p['img']!, fit: BoxFit.cover, width: double.infinity,
-                      errorBuilder: (_, __, ___) => Container(color: Colors.grey[200], child: const Icon(Icons.shopping_cart)),
+                    child: Image.network(p.imageUrl, fit: BoxFit.cover, width: double.infinity,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: isDark ? Colors.grey[800] : Colors.grey[200], 
+                        child: const Icon(Icons.shopping_cart, color: Colors.grey)
+                      ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(p['name']!, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white : Colors.black87)),
-                      const SizedBox(height: 4),
-                      Text('ETB ${p['price']}', style: TextStyle(color: isDark ? Colors.blue[300] : AppTheme.primaryBlue, fontWeight: FontWeight.w900, fontSize: 14)),
-                      const SizedBox(height: 10),
+                      Text(
+                        p.name, 
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white : Colors.black87),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'ETB ${p.price}', 
+                        style: TextStyle(color: isDark ? Colors.blue[300] : AppTheme.primaryBlue, fontWeight: FontWeight.w900, fontSize: 14)
+                      ),
+                      const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         height: 38,
                         child: ElevatedButton(
-                          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen())),
+                          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen(redirectTo: 'shop'))),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red, // Using red as requested for buy buttons
+                            backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            elevation: 0,
                           ),
-                          child: const Text('LOGIN TO BUY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                          child: Text(
+                            AppTranslations.getText(lang, 'login_to_buy'), 
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5)
+                          ),
                         ),
                       ),
                     ],
@@ -88,3 +98,4 @@ class ShopScreen extends StatelessWidget {
     );
   }
 }
+

@@ -19,9 +19,12 @@ class NavigationData {
     'Closing Soon': 'https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=800',
 
     // Governments
-    'Regional Sector': 'https://images.unsplash.com/photo-1577412647305-991150c7d163?q=80&w=800',
-    'Zone': 'https://images.unsplash.com/photo-1524813686514-a57563d77965?q=80&w=800',
-    'Woreda': 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=800',
+    'Regional Sector': 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800',
+    'Zone': 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=800',
+    'Woreda': 'https://images.unsplash.com/photo-1541970730449-623625f3fb40?q=80&w=800',
+    'City': 'https://images.unsplash.com/photo-1449156001931-828320f51835?q=80&w=800',
+    'Sub-city': 'https://images.unsplash.com/photo-1460574283810-2aab119d8511?q=80&w=800',
+    'Kebele': 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=800',
     
     // Kallacha Oromiyaa (Corrected Mappings)
     'Weekly Newspaper': 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800',
@@ -31,8 +34,10 @@ class NavigationData {
     'Archive': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=800',
     'Book': 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=800',
     'File': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=800',
+    'Kallacha Oromiyaa': 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800',
 
     // Media
+    'Media': 'https://images.unsplash.com/photo-1492724441997-5dc865305da7?q=80&w=800',
     'Press Release': 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=800',
     'Documentation': 'https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=800',
     'Video': 'https://images.unsplash.com/photo-1492724441997-5dc865305da7?q=80&w=800',

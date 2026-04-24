@@ -1,23 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:oromiya_communication/theme/app_theme.dart';
+import 'package:oromiya_communication/localization/app_translations.dart';
+import 'package:oromiya_communication/localization/language_provider.dart';
+import 'package:provider/provider.dart';
 
 class NewsDetailScreen extends StatelessWidget {
   final String title;
   final String category;
   final String date;
+  final String imageUrl;
+  final String content;
 
   const NewsDetailScreen({
     super.key,
     required this.title,
     required this.category,
     required this.date,
+    required this.imageUrl,
+    required this.content,
   });
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context).currentLanguage;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
-        title: const Text('News Detail'),
+        title: Text(AppTranslations.getText(lang, 'news')),
+        backgroundColor: isDark ? const Color(0xFF1F1F1F) : AppTheme.primaryBlue,
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
@@ -33,11 +45,10 @@ class NewsDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
+            SizedBox(
               height: 250,
               width: double.infinity,
-              color: Colors.grey[300],
-              child: const Icon(Icons.image, size: 100, color: Colors.grey),
+              child: Image.network(imageUrl, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey[300], child: const Icon(Icons.image, size: 100))),
             ),
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -51,7 +62,7 @@ class NewsDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Text(
-                      category,
+                      AppTranslations.getText(lang, category).toUpperCase(),
                       style: const TextStyle(
                         color: AppTheme.primaryBlue,
                         fontWeight: FontWeight.bold,
@@ -62,10 +73,11 @@ class NewsDetailScreen extends StatelessWidget {
                   const SizedBox(height: 15),
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       height: 1.2,
+                      color: isDark ? Colors.white : Colors.black,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -87,14 +99,12 @@ class NewsDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const Divider(height: 40),
-                  const Text(
-                    'FINFINNEE - Biiroo Kominikeeshinii Oromiyaa dhimmoota biyyaalessaa fi naannoo irratti ibsa kenneera. Ibsa kanaan akka jedhametti, naannichi damee misoomaatiin injifannoowwan jajjaboo galmeessisaa jira.\n\n'
-                    'Pirezidaantii Naannoo Oromiyaa Obbo Shimallis Abdiisaa akka jedhanitti, hojiileen misoomaa fi nageenyaa xiyyeeffannoo olaanaa argatanii hojjetamaa jiru. Keessattuu, guddinni dinagdee qonnaan wal qabatee jiru kan jajjabeeffamudha.\n\n'
-                    'Dabalataanis, tajaajila kantiinootaa fi manneen jireenyaa waliin wal qabatee rakkoolee jiran hiikuuf hojjetamaa akka jiru ibsameera. Marii uummataa waliin gaggeeffamuun ragaaleen dhihaachaa jiru.',
-                    style: TextStyle(fontSize: 16, height: 1.6),
+                  Text(
+                    content,
+                    style: TextStyle(fontSize: 16, height: 1.6, color: isDark ? Colors.white70 : Colors.black87),
                   ),
                   const SizedBox(height: 30),
-                  _buildFooterBrand(),
+                  _buildFooterBrand(lang),
                 ],
               ),
             ),
@@ -104,7 +114,7 @@ class NewsDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFooterBrand() {
+  Widget _buildFooterBrand(String lang) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -118,12 +128,12 @@ class NewsDetailScreen extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'Biiroo Kominikeeshinii Oromiyaa',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  AppTranslations.getText(lang, 'app_title'),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
-                Text(
+                const Text(
                   'info@oromiacommunication.gov.et',
                   style: TextStyle(color: Colors.white70, fontSize: 12),
                 ),

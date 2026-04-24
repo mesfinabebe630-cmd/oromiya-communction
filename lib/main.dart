@@ -23,14 +23,15 @@ class OromiaCommApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
+    return Consumer2<ThemeProvider, LanguageProvider>(
+      builder: (context, themeProvider, langProvider, child) {
         return MaterialApp(
           title: 'Oromia Communication Bureau',
           debugShowCheckedModeBanner: false,
           themeMode: themeProvider.themeMode,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
+          locale: Locale(langProvider.currentLanguage),
           home: const SplashScreen(),
         );
       },

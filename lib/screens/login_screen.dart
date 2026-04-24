@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:oromiya_communication/theme/app_theme.dart';
 import 'package:oromiya_communication/widgets/custom_header.dart';
+import 'package:oromiya_communication/localization/app_translations.dart';
+import 'package:oromiya_communication/localization/language_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool isTab;
-  const LoginScreen({super.key, this.isTab = false});
+  final String? redirectTo;
+  const LoginScreen({super.key, this.isTab = false, this.redirectTo});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -14,9 +18,19 @@ class _LoginScreenState extends State<LoginScreen> {
   // 0: Login, 1: Register, 2: Forgot Password
   int _viewMode = 0;
 
+  void _handleLoginSuccess() {
+    if (widget.redirectTo == 'tenders') {
+      Navigator.pop(context); // Go back to tender screen and maybe refresh state
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final lp = Provider.of<LanguageProvider>(context);
+    final lang = lp.currentLanguage;
 
     Widget content = SingleChildScrollView(
       child: Center(
@@ -34,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
               )
             ],
           ),
-          child: _buildContent(isDark),
+          child: _buildContent(isDark, lang),
         ),
       ),
     );
@@ -67,26 +81,26 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildContent(bool isDark) {
+  Widget _buildContent(bool isDark, String lang) {
     switch (_viewMode) {
-      case 1: return _buildRegisterForm(isDark);
-      case 2: return _buildForgotForm(isDark);
-      default: return _buildLoginForm(isDark);
+      case 1: return _buildRegisterForm(isDark, lang);
+      case 2: return _buildForgotForm(isDark, lang);
+      default: return _buildLoginForm(isDark, lang);
     }
   }
 
   // --- LOGIN FORM ---
-  Widget _buildLoginForm(bool isDark) {
+  Widget _buildLoginForm(bool isDark, String lang) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+        Text(AppTranslations.getText(lang, 'login'), style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
         const SizedBox(height: 24),
-        _label('Username or Email Address *', isDark),
-        _textField(hint: 'Enter your username or email', isDark: isDark),
+        _label(AppTranslations.getText(lang, 'username_or_email') + ' *', isDark),
+        _textField(hint: AppTranslations.getText(lang, 'username_or_email'), isDark: isDark),
         const SizedBox(height: 16),
-        _label('Password *', isDark),
-        _textField(hint: 'Enter your password', obscure: true, isDark: isDark),
+        _label(AppTranslations.getText(lang, 'password') + ' *', isDark),
+        _textField(hint: AppTranslations.getText(lang, 'password'), obscure: true, isDark: isDark),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -96,19 +110,19 @@ class _LoginScreenState extends State<LoginScreen> {
               activeColor: AppTheme.primaryBlue,
               side: BorderSide(color: isDark ? Colors.white54 : Colors.grey),
             ),
-            Text('Remember Me', style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
+            Text(AppTranslations.getText(lang, 'remember_me'), style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
           ],
         ),
         const SizedBox(height: 24),
-        _redButton('LOGIN', () {}),
+        _redButton(AppTranslations.getText(lang, 'login').toUpperCase(), _handleLoginSuccess),
         const SizedBox(height: 20),
         Center(child: Text('OR', style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontWeight: FontWeight.bold))),
         const SizedBox(height: 20),
         Row(
           children: [
-            Expanded(child: _blackButton('REGISTER', () => setState(() => _viewMode = 1), isDark)),
+            Expanded(child: _blackButton(AppTranslations.getText(lang, 'register').toUpperCase(), () => setState(() => _viewMode = 1), isDark)),
             const SizedBox(width: 12),
-            Expanded(child: _blackButton('FORGET', () => setState(() => _viewMode = 2), isDark)),
+            Expanded(child: _blackButton(AppTranslations.getText(lang, 'forget').toUpperCase(), () => setState(() => _viewMode = 2), isDark)),
           ],
         ),
       ],
@@ -116,40 +130,40 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // --- REGISTER FORM ---
-  Widget _buildRegisterForm(bool isDark) {
+  Widget _buildRegisterForm(bool isDark, String lang) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Register', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+            Text(AppTranslations.getText(lang, 'register'), style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             if (widget.isTab) IconButton(onPressed: () => setState(() => _viewMode = 0), icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.grey)),
           ],
         ),
         const SizedBox(height: 24),
-        _label('Full Name *', isDark),
-        _textField(hint: 'Enter your full name', isDark: isDark),
+        _label(AppTranslations.getText(lang, 'full_name') + ' *', isDark),
+        _textField(hint: AppTranslations.getText(lang, 'full_name'), isDark: isDark),
         const SizedBox(height: 16),
-        _label('Email Address *', isDark),
-        _textField(hint: 'Enter your email', isDark: isDark),
+        _label(AppTranslations.getText(lang, 'email_address') + ' *', isDark),
+        _textField(hint: AppTranslations.getText(lang, 'email_address'), isDark: isDark),
         const SizedBox(height: 16),
-        _label('Phone Number *', isDark),
-        _textField(hint: '+251912345678', keyboardType: TextInputType.phone, isDark: isDark),
+        _label(AppTranslations.getText(lang, 'phone_number') + ' *', isDark),
+        _textField(hint: AppTranslations.getText(lang, 'phone_number'), keyboardType: TextInputType.phone, isDark: isDark),
         const SizedBox(height: 16),
-        _label('Password *', isDark),
-        _textField(hint: 'Create a password', obscure: true, isDark: isDark),
+        _label(AppTranslations.getText(lang, 'password') + ' *', isDark),
+        _textField(hint: AppTranslations.getText(lang, 'password'), obscure: true, isDark: isDark),
         const SizedBox(height: 16),
-        _label('Confirm Password *', isDark),
-        _textField(hint: 'Confirm your password', obscure: true, isDark: isDark),
+        _label(AppTranslations.getText(lang, 'confirm_password') + ' *', isDark),
+        _textField(hint: AppTranslations.getText(lang, 'confirm_password'), obscure: true, isDark: isDark),
         const SizedBox(height: 16),
         _passwordRequirementBox(isDark),
         const SizedBox(height: 24),
-        _redButton('CREATE ACCOUNT', () {}),
+        _redButton(AppTranslations.getText(lang, 'create_account').toUpperCase(), _handleLoginSuccess),
         if (widget.isTab) Center(
           child: TextButton(
             onPressed: () => setState(() => _viewMode = 0),
-            child: const Text('Already have an account? Login', style: TextStyle(color: AppTheme.primaryBlue)),
+            child: Text(AppTranslations.getText(lang, 'Already have an account? Login'), style: const TextStyle(color: AppTheme.primaryBlue)),
           ),
         ),
       ],
@@ -157,28 +171,28 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // --- FORGOT PASSWORD ---
-  Widget _buildForgotForm(bool isDark) {
+  Widget _buildForgotForm(bool isDark, String lang) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Reset Password', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+            Text(AppTranslations.getText(lang, 'reset_password'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             if (widget.isTab) IconButton(onPressed: () => setState(() => _viewMode = 0), icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.grey)),
           ],
         ),
         const SizedBox(height: 12),
-        Text('Enter your email and we’ll send you a password reset link.', style: TextStyle(color: isDark ? Colors.white60 : Colors.grey, fontSize: 14)),
+        Text(AppTranslations.getText(lang, 'Enter your email and we’ll send you a password reset link.'), style: TextStyle(color: isDark ? Colors.white60 : Colors.grey, fontSize: 14)),
         const SizedBox(height: 24),
-        _label('Email Address *', isDark),
-        _textField(hint: 'Enter your email', isDark: isDark),
+        _label(AppTranslations.getText(lang, 'email_address') + ' *', isDark),
+        _textField(hint: AppTranslations.getText(lang, 'email_address'), isDark: isDark),
         const SizedBox(height: 32),
-        _redButton('SEND RESET LINK', () {}),
+        _redButton(AppTranslations.getText(lang, 'send_reset_link').toUpperCase(), () {}),
         if (widget.isTab) Center(
           child: TextButton(
             onPressed: () => setState(() => _viewMode = 0),
-            child: const Text('Back to Login', style: TextStyle(color: AppTheme.primaryBlue)),
+            child: Text(AppTranslations.getText(lang, 'Back to Login'), style: const TextStyle(color: AppTheme.primaryBlue)),
           ),
         ),
       ],

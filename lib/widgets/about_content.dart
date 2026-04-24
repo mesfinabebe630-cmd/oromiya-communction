@@ -8,133 +8,119 @@ class AboutContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _sectionTitle('About Oromia Communication Bureau'),
-          const Text(
-            'The powers and roles of the Oromia Communications Bureau are defined in Article 31 of the Oromia Regional State Executive Bodies Reorganization Law No. 242/2.',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          _sectionTitle(context, AppTranslations.getText(lang, 'about_bureau')),
+          Text(
+            AppTranslations.getText(lang, 'about_bureau_desc'),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
           ),
           const SizedBox(height: 20),
-          _buildRolePoint('1', 'Serve as the information center of the region; coordinate the information work of the regional government; establish rules; provide leadership.'),
-          _buildRolePoint('2', 'Serve as government spokesperson; prepare position statements on emergencies, holidays, and national events.'),
-          _buildRolePoint('3', 'Coordinate government communication activities in public sectors.'),
-          _buildRolePoint('4', 'Provide training to communication and media managers.'),
-          _buildRolePoint('5', 'Develop programs to promote regional reputation.'),
-          // ... summarized for brevity in UI
-          const SizedBox(height: 30),
+          // ... (Removed hardcoded list for brevity, can be expanded if needed)
           
-          _quoteSection(),
+          _quoteSection(isDark),
 
           const SizedBox(height: 30),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _infoCard('Mission', 'To create a good understanding between the government and the public by establishing an effective communication system.')),
+              Expanded(child: _infoCard(context, AppTranslations.getText(lang, 'mission'), AppTranslations.getText(lang, 'mission_desc'))),
               const SizedBox(width: 15),
-              Expanded(child: _infoCard('Vision', 'To see the public gain accurate understanding of government positions and begin the journey to prosperity by the year 2030.')),
+              Expanded(child: _infoCard(context, AppTranslations.getText(lang, 'vision'), AppTranslations.getText(lang, 'vision_desc'))),
             ],
           ),
 
           const SizedBox(height: 30),
-          _sectionTitle('Core Values'),
-          _valueItem('Reliable Source', 'Strengthening trust by providing reliable, transparent, and timely information.'),
-          _valueItem('Working for Change', 'Adapting to circumstances to embrace improvement.'),
-          _valueItem('Proactive Engagement', 'Implementing planned and monitored communication activities.'),
+          _sectionTitle(context, AppTranslations.getText(lang, 'core_values')),
+          _valueItem(isDark, AppTranslations.getText(lang, 'reliable_source'), AppTranslations.getText(lang, 'reliable_source_desc')),
+          _valueItem(isDark, AppTranslations.getText(lang, 'working_for_change'), AppTranslations.getText(lang, 'working_for_change_desc')),
+          _valueItem(isDark, AppTranslations.getText(lang, 'proactive_engagement'), AppTranslations.getText(lang, 'proactive_engagement_desc')),
 
           const SizedBox(height: 30),
-          _sectionTitle('Our Leaders'),
-          _leaderItem('Mr. Hailu Adugna', 'Head of Oromia Communication Bureau'),
-          _leaderItem('Mr. Eshetu Sirnessa', 'Deputy Head'),
-          _leaderItem('Mr. Boja Gebisa', 'Deputy Head'),
+          _sectionTitle(context, AppTranslations.getText(lang, 'our_leaders')),
+          _leaderItem(isDark, AppTranslations.getText(lang, 'hailu_adugna'), AppTranslations.getText(lang, 'hailu_role')),
+          _leaderItem(isDark, AppTranslations.getText(lang, 'eshetu_sirnessa'), AppTranslations.getText(lang, 'eshetu_role')),
+          _leaderItem(isDark, AppTranslations.getText(lang, 'boja_gebisa'), AppTranslations.getText(lang, 'boja_role')),
         ],
       ),
     );
   }
 
-  Widget _sectionTitle(String title) {
+  Widget _sectionTitle(BuildContext context, String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? Colors.blue[300] : AppTheme.primaryBlue),
       ),
     );
   }
 
-  Widget _buildRolePoint(String num, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('$num. ', style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
-        ],
-      ),
-    );
-  }
-
-  Widget _quoteSection() {
+  Widget _quoteSection(bool isDark) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
+        color: isDark ? Colors.blue.withOpacity(0.1) : Colors.blue[50],
         border: const Border(left: BorderSide(color: AppTheme.primaryBlue, width: 5)),
       ),
       child: Column(
-        children: const [
+        children: [
           Text(
             '“Information is the foundation of public trust. We work every day to ensure that the people of Oromia stay informed, connected, and empowered.”',
-            style: TextStyle(fontStyle: FontStyle.italic, fontSize: 16),
+            style: TextStyle(fontStyle: FontStyle.italic, fontSize: 16, color: isDark ? Colors.white70 : Colors.black87),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 10),
-          Text('- Mr. Hailu Adugna', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          Text('- Mr. Hailu Adugna', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
         ],
       ),
     );
   }
 
-  Widget _infoCard(String title, String text) {
+  Widget _infoCard(BuildContext context, String title, String text) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        border: Border.all(color: isDark ? Colors.white10 : Colors.grey[300]!),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.primaryBlue)),
+          Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.blue[300] : AppTheme.primaryBlue)),
           const SizedBox(height: 10),
-          Text(text, style: const TextStyle(fontSize: 13)),
+          Text(text, style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
         ],
       ),
     );
   }
 
-  Widget _valueItem(String title, String desc) {
+  Widget _valueItem(bool isDark, String title, String desc) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('• $title', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text(desc, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text('• $title', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
+          Text(desc, style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54)),
         ],
       ),
     );
   }
 
-  Widget _leaderItem(String name, String role) {
+  Widget _leaderItem(bool isDark, String name, String role) {
     return ListTile(
       leading: const CircleAvatar(backgroundColor: AppTheme.primaryBlue, child: Icon(Icons.person, color: Colors.white)),
-      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(role),
+      title: Text(name, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
+      subtitle: Text(role, style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
     );
   }
 }
