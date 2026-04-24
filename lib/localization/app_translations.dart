@@ -34,6 +34,8 @@ class AppTranslations {
       'most_viewed': 'Most Viewed',
       'read_more': 'READ MORE',
       'search': 'Search',
+      'share_app': 'Share App',
+      'rate_us': 'Rate Us',
     },
     'am': {
       'app_title': 'የኦሮሚያ ኮሙኒኬሽን ቢሮ',
@@ -69,6 +71,8 @@ class AppTranslations {
       'most_viewed': 'ብዙ የታየ',
       'read_more': 'ተጨማሪ ያንብቡ',
       'search': 'ፈልግ',
+      'share_app': 'መተግበሪያውን ያጋሩ',
+      'rate_us': 'ደረጃ ይስጡን',
     },
     'om': {
       'app_title': 'Biiroo Komunikeeshinii Oromiyaa',
@@ -104,6 +108,8 @@ class AppTranslations {
       'most_viewed': 'Baay\'ee kan ilaalame',
       'read_more': 'DUBBISII',
       'search': 'Barbaadi',
+      'share_app': 'Appilikeeshinii Qoodi',
+      'rate_us': 'Sadarkaa Kenni',
     },
   };
 

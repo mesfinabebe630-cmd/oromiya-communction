@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:oromiya_communication/theme/app_theme.dart';
 import 'package:oromiya_communication/localization/app_translations.dart';
 import 'package:oromiya_communication/localization/language_provider.dart';
@@ -182,8 +184,19 @@ class _SettingsBottomSheet extends StatelessWidget {
             Navigator.pop(context);
             if (onAction != null) onAction!('Contact Us');
           }),
-          _menuItem(context, lang, Icons.share_outlined, 'Share App', () {}),
-          _menuItem(context, lang, Icons.star_outline, 'Rate Us', () {}),
+          _menuItem(context, lang, Icons.share_outlined, 'Share App', () {
+            Navigator.pop(context);
+            Share.share(
+              'Download the official Oromia Communication Bureau app to get the latest News, Tenders, and Kallacha Oromiyaa updates: https://github.com/mesfinabebe630-cmd/oromiya-communction',
+              subject: 'Oromia Communication App',
+            );
+          }),
+          _menuItem(context, lang, Icons.star_outline, 'Rate Us', () {
+            Navigator.pop(context);
+            // In a real app, this would link to Play Store/App Store
+            final Uri url = Uri.parse('https://github.com/mesfinabebe630-cmd/oromiya-communction');
+            launchUrl(url);
+          }),
           
           const SizedBox(height: 20),
         ],
