@@ -16,6 +16,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     Widget content = SingleChildScrollView(
       child: Center(
         child: Container(
@@ -23,26 +25,31 @@ class _LoginScreenState extends State<LoginScreen> {
           margin: EdgeInsets.symmetric(vertical: widget.isTab ? 20 : 40, horizontal: 20),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20)],
+            boxShadow: [
+              BoxShadow(
+                color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
+                blurRadius: 20,
+              )
+            ],
           ),
-          child: _buildContent(),
+          child: _buildContent(isDark),
         ),
       ),
     );
 
     if (widget.isTab) {
       return Container(
-        color: const Color(0xFFF5F5F5),
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: content,
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.primaryBlue,
+        backgroundColor: isDark ? const Color(0xFF1F1F1F) : AppTheme.primaryBlue,
         elevation: 0,
         title: const CustomHeader(),
         leading: IconButton(
@@ -60,43 +67,48 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(bool isDark) {
     switch (_viewMode) {
-      case 1: return _buildRegisterForm();
-      case 2: return _buildForgotForm();
-      default: return _buildLoginForm();
+      case 1: return _buildRegisterForm(isDark);
+      case 2: return _buildForgotForm(isDark);
+      default: return _buildLoginForm(isDark);
     }
   }
 
   // --- LOGIN FORM ---
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
+        Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
         const SizedBox(height: 24),
-        _label('Username or Email Address *'),
-        _textField(hint: 'Enter your username or email'),
+        _label('Username or Email Address *', isDark),
+        _textField(hint: 'Enter your username or email', isDark: isDark),
         const SizedBox(height: 16),
-        _label('Password *'),
-        _textField(hint: 'Enter your password', obscure: true),
+        _label('Password *', isDark),
+        _textField(hint: 'Enter your password', obscure: true, isDark: isDark),
         const SizedBox(height: 12),
         Row(
           children: [
-            Checkbox(value: false, onChanged: (v) {}, activeColor: AppTheme.primaryBlue),
-            const Text('Remember Me', style: TextStyle(fontSize: 13)),
+            Checkbox(
+              value: false,
+              onChanged: (v) {},
+              activeColor: AppTheme.primaryBlue,
+              side: BorderSide(color: isDark ? Colors.white54 : Colors.grey),
+            ),
+            Text('Remember Me', style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
           ],
         ),
         const SizedBox(height: 24),
         _redButton('LOGIN', () {}),
         const SizedBox(height: 20),
-        const Center(child: Text('OR', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))),
+        Center(child: Text('OR', style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontWeight: FontWeight.bold))),
         const SizedBox(height: 20),
         Row(
           children: [
-            Expanded(child: _blackButton('REGISTER', () => setState(() => _viewMode = 1))),
+            Expanded(child: _blackButton('REGISTER', () => setState(() => _viewMode = 1), isDark)),
             const SizedBox(width: 12),
-            Expanded(child: _blackButton('FORGET', () => setState(() => _viewMode = 2))),
+            Expanded(child: _blackButton('FORGET', () => setState(() => _viewMode = 2), isDark)),
           ],
         ),
       ],
@@ -104,34 +116,34 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // --- REGISTER FORM ---
-  Widget _buildRegisterForm() {
+  Widget _buildRegisterForm(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Register', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
-            if (widget.isTab) IconButton(onPressed: () => setState(() => _viewMode = 0), icon: const Icon(Icons.close, color: Colors.grey)),
+            Text('Register', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+            if (widget.isTab) IconButton(onPressed: () => setState(() => _viewMode = 0), icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.grey)),
           ],
         ),
         const SizedBox(height: 24),
-        _label('Full Name *'),
-        _textField(hint: 'Enter your full name'),
+        _label('Full Name *', isDark),
+        _textField(hint: 'Enter your full name', isDark: isDark),
         const SizedBox(height: 16),
-        _label('Email Address *'),
-        _textField(hint: 'Enter your email'),
+        _label('Email Address *', isDark),
+        _textField(hint: 'Enter your email', isDark: isDark),
         const SizedBox(height: 16),
-        _label('Phone Number *'),
-        _textField(hint: '+251912345678', keyboardType: TextInputType.phone),
+        _label('Phone Number *', isDark),
+        _textField(hint: '+251912345678', keyboardType: TextInputType.phone, isDark: isDark),
         const SizedBox(height: 16),
-        _label('Password *'),
-        _textField(hint: 'Create a password', obscure: true),
+        _label('Password *', isDark),
+        _textField(hint: 'Create a password', obscure: true, isDark: isDark),
         const SizedBox(height: 16),
-        _label('Confirm Password *'),
-        _textField(hint: 'Confirm your password', obscure: true),
+        _label('Confirm Password *', isDark),
+        _textField(hint: 'Confirm your password', obscure: true, isDark: isDark),
         const SizedBox(height: 16),
-        _passwordRequirementBox(),
+        _passwordRequirementBox(isDark),
         const SizedBox(height: 24),
         _redButton('CREATE ACCOUNT', () {}),
         if (widget.isTab) Center(
@@ -145,22 +157,22 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // --- FORGOT PASSWORD ---
-  Widget _buildForgotForm() {
+  Widget _buildForgotForm(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Reset Password', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            if (widget.isTab) IconButton(onPressed: () => setState(() => _viewMode = 0), icon: const Icon(Icons.close, color: Colors.grey)),
+            Text('Reset Password', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+            if (widget.isTab) IconButton(onPressed: () => setState(() => _viewMode = 0), icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.grey)),
           ],
         ),
         const SizedBox(height: 12),
-        const Text('Enter your email and we’ll send you a password reset link.', style: TextStyle(color: Colors.grey, fontSize: 14)),
+        Text('Enter your email and we’ll send you a password reset link.', style: TextStyle(color: isDark ? Colors.white60 : Colors.grey, fontSize: 14)),
         const SizedBox(height: 24),
-        _label('Email Address *'),
-        _textField(hint: 'Enter your email'),
+        _label('Email Address *', isDark),
+        _textField(hint: 'Enter your email', isDark: isDark),
         const SizedBox(height: 32),
         _redButton('SEND RESET LINK', () {}),
         if (widget.isTab) Center(
@@ -173,51 +185,55 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _label(String text) => Padding(
+  Widget _label(String text, bool isDark) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
-    child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+    child: Text(text, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
   );
 
-  Widget _textField({String? hint, bool obscure = false, TextInputType? keyboardType}) {
+  Widget _textField({String? hint, bool obscure = false, TextInputType? keyboardType, required bool isDark}) {
     return TextField(
       obscureText: obscure,
       keyboardType: keyboardType,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+        hintStyle: TextStyle(color: isDark ? Colors.white30 : Colors.grey[400], fontSize: 13),
         filled: true,
-        fillColor: Colors.grey[50],
+        fillColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey[50],
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Colors.grey[300]!)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Colors.grey[200]!)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[200]!)),
       ),
     );
   }
 
-  Widget _passwordRequirementBox() {
+  Widget _passwordRequirementBox(bool isDark) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.blue.withOpacity(0.05), borderRadius: BorderRadius.circular(4)),
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.primaryBlue.withOpacity(0.1) : Colors.blue.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(4),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Password must contain:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+          Text('Password must contain:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: isDark ? Colors.white : Colors.black)),
           const SizedBox(height: 6),
-          _reqItem('At least 8 characters'),
-          _reqItem('At least one uppercase letter'),
-          _reqItem('At least one lowercase letter'),
-          _reqItem('At least one number'),
-          _reqItem('One special character (@\$!%*?&)'),
+          _reqItem('At least 8 characters', isDark),
+          _reqItem('At least one uppercase letter', isDark),
+          _reqItem('At least one lowercase letter', isDark),
+          _reqItem('At least one number', isDark),
+          _reqItem('One special character (@\$!%*?&)', isDark),
         ],
       ),
     );
   }
 
-  Widget _reqItem(String text) => Row(
+  Widget _reqItem(String text, bool isDark) => Row(
     children: [
       const Icon(Icons.check_circle_outline, size: 12, color: Colors.blue),
       const SizedBox(width: 6),
-      Text(text, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+      Text(text, style: TextStyle(fontSize: 11, color: isDark ? Colors.white60 : Colors.black54)),
     ],
   );
 
@@ -231,12 +247,16 @@ class _LoginScreenState extends State<LoginScreen> {
     ),
   );
 
-  Widget _blackButton(String text, VoidCallback onTap) => SizedBox(
+  Widget _blackButton(String text, VoidCallback onTap, bool isDark) => SizedBox(
     width: double.infinity,
     height: 50,
     child: ElevatedButton(
       onPressed: onTap,
-      style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isDark ? Colors.white10 : Colors.black,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      ),
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1)),
     ),
   );

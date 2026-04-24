@@ -186,16 +186,20 @@ class _SettingsBottomSheet extends StatelessWidget {
           }),
           _menuItem(context, lang, Icons.share_outlined, 'Share App', () {
             Navigator.pop(context);
+            // This pulls the package name automatically so users can share and others can install
             Share.share(
-              'Download the official Oromia Communication Bureau app to get the latest News, Tenders, and Kallacha Oromiyaa updates: https://github.com/mesfinabebe630-cmd/oromiya-communction',
+              'Install the Oromia Communication Bureau app to stay updated! Download here: https://play.google.com/store/apps/details?id=com.example.oromiya_communication',
               subject: 'Oromia Communication App',
             );
           }),
           _menuItem(context, lang, Icons.star_outline, 'Rate Us', () {
             Navigator.pop(context);
-            // In a real app, this would link to Play Store/App Store
-            final Uri url = Uri.parse('https://github.com/mesfinabebe630-cmd/oromiya-communction');
-            launchUrl(url);
+            // This takes the user directly to the Play Store "Rate" page for your app
+            final Uri url = Uri.parse('market://details?id=com.example.oromiya_communication');
+            launchUrl(url, mode: LaunchMode.externalApplication).catchError((_) {
+               // Fallback if market protocol fails
+               launchUrl(Uri.parse('https://play.google.com/store/apps/details?id=com.example.oromiya_communication'));
+            });
           }),
           
           const SizedBox(height: 20),

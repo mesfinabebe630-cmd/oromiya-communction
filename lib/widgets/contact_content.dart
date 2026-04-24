@@ -109,6 +109,7 @@ class ContactContent extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 20),
       child: TextField(
         maxLines: maxLines,
+        style: const TextStyle(color: Colors.black, fontSize: 14), // Ensures black text
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(fontSize: 12),
