@@ -12,6 +12,7 @@ class ShopScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final lp = Provider.of<LanguageProvider>(context);
     final lang = lp.currentLanguage;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final List<Map<String, String>> products = [
       {'name': 'Kallacha Weekly', 'price': '15.00', 'img': 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=400'},
@@ -21,10 +22,10 @@ class ShopScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F7F9),
       appBar: AppBar(
         title: Text(AppTranslations.getText(lang, 'Shops')),
-        backgroundColor: AppTheme.primaryBlue,
+        backgroundColor: isDark ? const Color(0xFF1F1F1F) : AppTheme.primaryBlue,
       ),
       // Footer is removed here (no Footer widget at bottom)
       body: GridView.builder(
@@ -40,6 +41,7 @@ class ShopScreen extends StatelessWidget {
           final p = products[index];
           return Card(
             elevation: 2,
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,9 +59,9 @@ class ShopScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(p['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      Text(p['name']!, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white : Colors.black87)),
                       const SizedBox(height: 4),
-                      Text('ETB ${p['price']}', style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.w900, fontSize: 14)),
+                      Text('ETB ${p['price']}', style: TextStyle(color: isDark ? Colors.blue[300] : AppTheme.primaryBlue, fontWeight: FontWeight.w900, fontSize: 14)),
                       const SizedBox(height: 10),
                       SizedBox(
                         width: double.infinity,

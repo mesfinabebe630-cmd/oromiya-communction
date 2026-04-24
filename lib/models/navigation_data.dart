@@ -23,10 +23,21 @@ class NavigationData {
     'Zone': 'https://images.unsplash.com/photo-1524813686514-a57563d77965?q=80&w=800',
     'Woreda': 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=800',
     
-    // Kallacha
+    // Kallacha Oromiyaa (Corrected Mappings)
     'Weekly Newspaper': 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800',
-    'Quarterly Newspaper': 'https://images.unsplash.com/photo-1585829365294-18d530cba2d8?q=80&w=800',
-    'Yearly Book': 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=800',
+    'Quarterly Newspaper': 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=800',
+    'Yearly Book': 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800',
+    'Brochure': 'https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=800',
+    'Archive': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=800',
+    'Book': 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=800',
+    'File': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=800',
+
+    // Media
+    'Press Release': 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=800',
+    'Documentation': 'https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=800',
+    'Video': 'https://images.unsplash.com/photo-1492724441997-5dc865305da7?q=80&w=800',
+    'Image & Gallery': 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=800',
+    'Audio File': 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=800',
 
     // Shops/General
     'Shops': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800',

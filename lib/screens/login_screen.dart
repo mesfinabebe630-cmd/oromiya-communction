@@ -3,7 +3,8 @@ import 'package:oromiya_communication/theme/app_theme.dart';
 import 'package:oromiya_communication/widgets/custom_header.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final bool isTab;
+  const LoginScreen({super.key, this.isTab = false});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -15,6 +16,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget content = SingleChildScrollView(
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 450),
+          margin: EdgeInsets.symmetric(vertical: widget.isTab ? 20 : 40, horizontal: 20),
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20)],
+          ),
+          child: _buildContent(),
+        ),
+      ),
+    );
+
+    if (widget.isTab) {
+      return Container(
+        color: const Color(0xFFF5F5F5),
+        child: content,
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -32,21 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         ),
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 450),
-            margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20)],
-            ),
-            child: _buildContent(),
-          ),
-        ),
-      ),
+      body: content,
     );
   }
 
@@ -98,7 +108,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Register', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Register', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
+            if (widget.isTab) IconButton(onPressed: () => setState(() => _viewMode = 0), icon: const Icon(Icons.close, color: Colors.grey)),
+          ],
+        ),
         const SizedBox(height: 24),
         _label('Full Name *'),
         _textField(hint: 'Enter your full name'),
@@ -118,6 +134,12 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordRequirementBox(),
         const SizedBox(height: 24),
         _redButton('CREATE ACCOUNT', () {}),
+        if (widget.isTab) Center(
+          child: TextButton(
+            onPressed: () => setState(() => _viewMode = 0),
+            child: const Text('Already have an account? Login', style: TextStyle(color: AppTheme.primaryBlue)),
+          ),
+        ),
       ],
     );
   }
@@ -127,14 +149,26 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Reset Your Password', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Reset Password', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            if (widget.isTab) IconButton(onPressed: () => setState(() => _viewMode = 0), icon: const Icon(Icons.close, color: Colors.grey)),
+          ],
+        ),
         const SizedBox(height: 12),
         const Text('Enter your email and we’ll send you a password reset link.', style: TextStyle(color: Colors.grey, fontSize: 14)),
         const SizedBox(height: 24),
         _label('Email Address *'),
         _textField(hint: 'Enter your email'),
         const SizedBox(height: 32),
-        _redButton('SEND PASSWORD RESET LINK', () {}),
+        _redButton('SEND RESET LINK', () {}),
+        if (widget.isTab) Center(
+          child: TextButton(
+            onPressed: () => setState(() => _viewMode = 0),
+            child: const Text('Back to Login', style: TextStyle(color: AppTheme.primaryBlue)),
+          ),
+        ),
       ],
     );
   }

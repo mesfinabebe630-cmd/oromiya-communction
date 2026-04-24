@@ -7,11 +7,13 @@ class TendersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7F9),
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F7F9),
       appBar: AppBar(
         title: const Text('Tenders'),
-        backgroundColor: AppTheme.primaryBlue,
+        backgroundColor: isDark ? const Color(0xFF1F1F1F) : AppTheme.primaryBlue,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -21,9 +23,9 @@ class TendersScreen extends StatelessWidget {
             // Top Statistics
             Row(
               children: [
-                Expanded(child: _statBox('Total Tenders', '12', Colors.blue)),
+                Expanded(child: _statBox(context, 'Total Tenders', '12', Colors.blue)),
                 const SizedBox(width: 10),
-                Expanded(child: _statBox('Active Now', '9', Colors.orange)),
+                Expanded(child: _statBox(context, 'Active Now', '9', Colors.orange)),
               ],
             ),
             const SizedBox(height: 20),
@@ -49,13 +51,19 @@ class TendersScreen extends StatelessWidget {
     String fee = "1,000.00 ETB",
     String days = "7"
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.06), 
+            blurRadius: 15, 
+            offset: const Offset(0, 5)
+          )
         ],
       ),
       child: Padding(
@@ -94,18 +102,18 @@ class TendersScreen extends StatelessWidget {
             const SizedBox(height: 16),
             
             // Title & Office
-            Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A237E))),
+            Text(title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1A237E))),
             const SizedBox(height: 4),
-            const Text('Oromia Presidant Office', style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500)),
+            Text('Oromia Presidant Office', style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey, fontSize: 13, fontWeight: FontWeight.w500)),
             const SizedBox(height: 20),
 
             // ALL IN ONE RECTANGLE BOX
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8F9FB),
+                color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFF8F9FB),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE0E5EC)),
+                border: Border.all(color: isDark ? Colors.white10 : const Color(0xFFE0E5EC)),
               ),
               child: Column(
                 children: [
@@ -113,16 +121,16 @@ class TendersScreen extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: _infoItem(Icons.event_available, "Closing", "Apr 30, 2026")),
-                      Expanded(child: _infoItem(Icons.file_download_outlined, "Document", "Available")),
+                      Expanded(child: _infoItem(context, Icons.event_available, "Closing", "Apr 30, 2026")),
+                      Expanded(child: _infoItem(context, Icons.file_download_outlined, "Document", "Available")),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: _infoItem(Icons.fingerprint, "Project ID", id)),
-                      Expanded(child: _infoItem(Icons.account_balance_wallet_outlined, "Fee", fee)),
+                      Expanded(child: _infoItem(context, Icons.fingerprint, "Project ID", id)),
+                      Expanded(child: _infoItem(context, Icons.account_balance_wallet_outlined, "Fee", fee)),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -151,17 +159,18 @@ class TendersScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoItem(IconData icon, String label, String value) {
+  Widget _infoItem(BuildContext context, IconData icon, String label, String value) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
-        Icon(icon, size: 16, color: AppTheme.primaryBlue),
+        Icon(icon, size: 16, color: isDark ? Colors.blue[300] : AppTheme.primaryBlue),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
-              Text(value, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: Colors.black87), overflow: TextOverflow.ellipsis),
+              Text(label, style: TextStyle(color: isDark ? Colors.grey[500] : Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+              Text(value, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: isDark ? Colors.white : Colors.black87), overflow: TextOverflow.ellipsis),
             ],
           ),
         ),
@@ -169,18 +178,19 @@ class TendersScreen extends StatelessWidget {
     );
   }
 
-  Widget _statBox(String title, String val, Color color) {
+  Widget _statBox(BuildContext context, String title, String val, Color color) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withOpacity(0.2)),
       ),
       child: Column(
         children: [
           Text(val, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color)),
-          Text(title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Colors.grey)),
+          Text(title, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: isDark ? Colors.grey[400] : Colors.grey)),
         ],
       ),
     );

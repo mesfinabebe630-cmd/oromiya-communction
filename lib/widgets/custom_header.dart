@@ -8,7 +8,8 @@ import 'package:oromiya_communication/theme/theme_provider.dart';
 
 class CustomHeader extends StatefulWidget {
   final Function(String)? onMenuAction;
-  const CustomHeader({super.key, this.onMenuAction});
+  final VoidCallback? onSearchTap;
+  const CustomHeader({super.key, this.onMenuAction, this.onSearchTap});
 
   @override
   State<CustomHeader> createState() => _CustomHeaderState();
@@ -104,7 +105,11 @@ class _CustomHeaderState extends State<CustomHeader> {
           ),
         ),
 
-        // RIGHT SIDE: MENU ICON
+        // RIGHT SIDE: SEARCH & MENU ICONS
+        IconButton(
+          icon: const Icon(Icons.search, color: Colors.white, size: 24),
+          onPressed: widget.onSearchTap,
+        ),
         IconButton(
           icon: const Icon(Icons.menu, color: Colors.white, size: 26),
           onPressed: () => _openMenu(context),
